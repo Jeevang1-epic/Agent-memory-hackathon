@@ -5,6 +5,7 @@ pytest-cache-files-*/
 .venv/
 env/
 .env
+*.egg-info/
 _source_docs/
 .codex/
 data/memory.json
