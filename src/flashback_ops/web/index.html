@@ -82,12 +82,18 @@ redis pool saturation alerts</textarea>
           </div>
           <div class="cards">
             <article class="plan-card">
-              <h3>Without Memory</h3>
+              <div class="card-head">
+                <h3>Without Memory</h3>
+                <button type="button" id="copyWithoutBtn" class="btn small">Copy</button>
+              </div>
               <p id="withoutConfidence" class="confidence">Confidence 0.00</p>
               <ol id="withoutSteps"></ol>
             </article>
             <article class="plan-card memory">
-              <h3>With Memory</h3>
+              <div class="card-head">
+                <h3>With Memory</h3>
+                <button type="button" id="copyWithBtn" class="btn small">Copy</button>
+              </div>
               <p id="withConfidence" class="confidence">Confidence 0.00</p>
               <ol id="withSteps"></ol>
             </article>

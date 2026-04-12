@@ -14,6 +14,8 @@ const withoutSteps = document.getElementById("withoutSteps");
 const withSteps = document.getElementById("withSteps");
 const takeawayList = document.getElementById("takeawayList");
 const memoryTableBody = document.getElementById("memoryTableBody");
+const copyWithoutBtn = document.getElementById("copyWithoutBtn");
+const copyWithBtn = document.getElementById("copyWithBtn");
 let scenarios = [];
 
 async function callApi(path, payload = null, method = "GET") {
@@ -71,6 +73,10 @@ function renderMemoryRows(items) {
     `;
     memoryTableBody.appendChild(tr);
   });
+}
+
+function listText(values) {
+  return values.map((value, index) => `${index + 1}. ${value}`).join("\n");
 }
 
 function setFeedbackContext(payload) {
@@ -179,6 +185,16 @@ applyScenarioBtn.addEventListener("click", () => {
   if (selected) {
     hydrateForm(selected.payload);
   }
+});
+
+copyWithoutBtn.addEventListener("click", async () => {
+  const text = listText(Array.from(withoutSteps.querySelectorAll("li")).map((node) => node.textContent || ""));
+  await navigator.clipboard.writeText(text);
+});
+
+copyWithBtn.addEventListener("click", async () => {
+  const text = listText(Array.from(withSteps.querySelectorAll("li")).map((node) => node.textContent || ""));
+  await navigator.clipboard.writeText(text);
 });
 
 async function bootstrap() {

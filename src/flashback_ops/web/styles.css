@@ -169,6 +169,11 @@ textarea {
   width: 100%;
 }
 
+.btn.small {
+  padding: 0.3rem 0.6rem;
+  font-size: 0.82rem;
+}
+
 .output {
   display: grid;
   gap: 0.9rem;
@@ -206,7 +211,13 @@ textarea {
 }
 
 .plan-card h3 {
-  margin-top: 0;
+  margin: 0;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 0.4rem;
 }
 
