@@ -1,0 +1,20 @@
+[project]
+name = "flashback-ops"
+version = "0.1.0"
+description = "Memory-first incident response agent for the Hindsight Agent Memory Hackathon"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi>=0.111.0,<1.0.0",
+  "uvicorn>=0.30.0,<1.0.0",
+  "pydantic>=2.7.0,<3.0.0",
+  "httpx>=0.27.0,<1.0.0"
+]
+
+[project.optional-dependencies]
+hindsight = ["hindsight-client>=0.1.7"]
+dev = ["pytest>=8.0.0,<9.0.0"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

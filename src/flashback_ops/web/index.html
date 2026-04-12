@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Flashback Ops</title>
+    <link rel="stylesheet" href="/static/styles.css" />
+  </head>
+  <body>
+    <div class="background-grid"></div>
+    <main class="shell">
+      <header class="hero">
+        <div>
+          <p class="eyebrow">Hindsight Agent Memory</p>
+          <h1>Flashback Ops</h1>
+          <p class="subtitle">
+            Incident response copilot that learns from every outage and shows a clear memory vs no-memory delta.
+          </p>
+        </div>
+        <div class="hero-actions">
+          <button id="seedBtn" class="btn primary">Load Demo Memory</button>
+          <button id="statusBtn" class="btn">Refresh Status</button>
+        </div>
+      </header>
+
+      <section class="status-row">
+        <div class="chip">
+          <span>Backend</span>
+          <strong id="backendValue">local</strong>
+        </div>
+        <div class="chip">
+          <span>Memory Entries</span>
+          <strong id="entriesValue">0</strong>
+        </div>
+        <div class="chip">
+          <span>Active Sessions</span>
+          <strong id="sessionsValue">0</strong>
+        </div>
+      </section>
+
+      <section class="layout">
+        <form id="assistForm" class="panel">
+          <h2>New Incident Signal</h2>
+          <label>Service
+            <input name="service" value="payments-api" required />
+          </label>
+          <label>Severity
+            <select name="severity">
+              <option value="medium">medium</option>
+              <option value="high" selected>high</option>
+              <option value="critical">critical</option>
+              <option value="low">low</option>
+            </select>
+          </label>
+          <label>Objective
+            <input name="objective" value="restore checkout success to above 97% in under 30 minutes" required />
+          </label>
+          <label>Symptoms (one per line)
+            <textarea name="symptoms" rows="4">gateway timeout in card authorization
+checkout retries increased 4x
+redis pool saturation alerts</textarea>
+          </label>
+          <label>Logs
+            <textarea name="logs" rows="5">TimeoutError: redis connection pool exhausted on payment-session-cache</textarea>
+          </label>
+          <label>Tags (comma-separated)
+            <input name="tags" value="redis,checkout,timeouts" />
+          </label>
+          <button type="submit" class="btn primary full">Run Memory-Assisted Plan</button>
+        </form>
+
+        <section class="panel output">
+          <div class="boost">
+            <span>Memory Boost</span>
+            <strong id="boostValue">0.00</strong>
+          </div>
+          <div class="cards">
+            <article class="plan-card">
+              <h3>Without Memory</h3>
+              <p id="withoutConfidence" class="confidence">Confidence 0.00</p>
+              <ol id="withoutSteps"></ol>
+            </article>
+            <article class="plan-card memory">
+              <h3>With Memory</h3>
+              <p id="withConfidence" class="confidence">Confidence 0.00</p>
+              <ol id="withSteps"></ol>
+            </article>
+          </div>
+          <div class="takeaways">
+            <h3>Tactical Takeaways</h3>
+            <ul id="takeawayList"></ul>
+          </div>
+        </section>
+      </section>
+
+      <section class="panel memory-panel">
+        <h2>Recalled Memories</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Incident</th>
+              <th>Service</th>
+              <th>Score</th>
+              <th>Outcome</th>
+              <th>Root Cause</th>
+            </tr>
+          </thead>
+          <tbody id="memoryTableBody"></tbody>
+        </table>
+      </section>
+
+      <section class="panel">
+        <h2>Feedback Loop</h2>
+        <form id="feedbackForm">
+          <input type="hidden" name="query_id" />
+          <input type="hidden" name="session_id" />
+          <label>Outcome
+            <select name="outcome">
+              <option value="resolved">resolved</option>
+              <option value="partial">partial</option>
+              <option value="failed">failed</option>
+              <option value="unknown">unknown</option>
+            </select>
+          </label>
+          <label>Useful Steps (one per line)
+            <textarea name="useful_steps" rows="3"></textarea>
+          </label>
+          <label>Notes
+            <textarea name="notes" rows="3"></textarea>
+          </label>
+          <button type="submit" class="btn">Save Feedback to Memory</button>
+        </form>
+      </section>
+    </main>
+    <script src="/static/app.js" type="module"></script>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+Metadata-Version: 2.4
+Name: flashback-ops
+Version: 0.1.0
+Summary: Memory-first incident response agent for the Hindsight Agent Memory Hackathon
+Requires-Python: >=3.11
+Description-Content-Type: text/markdown
+License-File: LICENSE
+Requires-Dist: fastapi<1.0.0,>=0.111.0
+Requires-Dist: uvicorn<1.0.0,>=0.30.0
+Requires-Dist: pydantic<3.0.0,>=2.7.0
+Requires-Dist: httpx<1.0.0,>=0.27.0
+Provides-Extra: hindsight
+Requires-Dist: hindsight-client>=0.1.7; extra == "hindsight"
+Provides-Extra: dev
+Requires-Dist: pytest<9.0.0,>=8.0.0; extra == "dev"
+Dynamic: license-file
