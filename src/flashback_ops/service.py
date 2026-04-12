@@ -230,6 +230,49 @@ class IncidentService:
             self.retain_incident(record)
         return SeedResponse(inserted=len(records), status="seeded")
 
+    def demo_scenarios(self) -> list[dict[str, Any]]:
+        return [
+            {
+                "id": "payments-critical",
+                "name": "Payments timeout storm",
+                "payload": {
+                    "service": "payments-api",
+                    "severity": "critical",
+                    "objective": "restore checkout success above 97% in under 30 minutes",
+                    "symptoms": ["gateway timeout in card authorization", "checkout retries increased 4x", "redis pool saturation alerts"],
+                    "logs": "TimeoutError: redis connection pool exhausted on payment-session-cache",
+                    "tags": ["redis", "checkout", "timeouts"],
+                    "top_k": 4,
+                },
+            },
+            {
+                "id": "auth-jwt-break",
+                "name": "Auth signature mismatch",
+                "payload": {
+                    "service": "auth-service",
+                    "severity": "critical",
+                    "objective": "recover login conversion above 95%",
+                    "symptoms": ["token verification failing", "invalid signature spike"],
+                    "logs": "JWT signature mismatch after identity provider key rotation",
+                    "tags": ["jwt", "identity-provider", "cache"],
+                    "top_k": 4,
+                },
+            },
+            {
+                "id": "search-index-lag",
+                "name": "Search index lag",
+                "payload": {
+                    "service": "search-indexer",
+                    "severity": "high",
+                    "objective": "reduce index lag below 5 minutes",
+                    "symptoms": ["catalog search stale products", "consumer rebalance loop"],
+                    "logs": "Kafka heartbeat timeout and partition rebalance churn",
+                    "tags": ["kafka", "indexing", "search"],
+                    "top_k": 4,
+                },
+            },
+        ]
+
     def status(self) -> dict[str, Any]:
         stats = self.store.stats()
         return {

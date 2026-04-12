@@ -2,6 +2,8 @@ const assistForm = document.getElementById("assistForm");
 const feedbackForm = document.getElementById("feedbackForm");
 const statusBtn = document.getElementById("statusBtn");
 const seedBtn = document.getElementById("seedBtn");
+const scenarioSelect = document.getElementById("scenarioSelect");
+const applyScenarioBtn = document.getElementById("applyScenarioBtn");
 const backendValue = document.getElementById("backendValue");
 const entriesValue = document.getElementById("entriesValue");
 const sessionsValue = document.getElementById("sessionsValue");
@@ -12,6 +14,7 @@ const withoutSteps = document.getElementById("withoutSteps");
 const withSteps = document.getElementById("withSteps");
 const takeawayList = document.getElementById("takeawayList");
 const memoryTableBody = document.getElementById("memoryTableBody");
+let scenarios = [];
 
 async function callApi(path, payload = null, method = "GET") {
   const init = {
@@ -80,6 +83,26 @@ async function refreshStatus() {
   backendValue.textContent = payload.backend;
   entriesValue.textContent = String(payload.memory_entries);
   sessionsValue.textContent = String(payload.sessions);
+}
+
+function hydrateForm(payload) {
+  assistForm.elements.service.value = payload.service || "";
+  assistForm.elements.severity.value = payload.severity || "medium";
+  assistForm.elements.objective.value = payload.objective || "";
+  assistForm.elements.symptoms.value = (payload.symptoms || []).join("\n");
+  assistForm.elements.logs.value = payload.logs || "";
+  assistForm.elements.tags.value = (payload.tags || []).join(", ");
+}
+
+async function loadScenarios() {
+  scenarios = await callApi("/api/demo/scenarios");
+  scenarioSelect.innerHTML = "";
+  scenarios.forEach((scenario) => {
+    const option = document.createElement("option");
+    option.value = scenario.id;
+    option.textContent = scenario.name;
+    scenarioSelect.appendChild(option);
+  });
 }
 
 assistForm.addEventListener("submit", async (event) => {
@@ -151,4 +174,23 @@ seedBtn.addEventListener("click", async () => {
   }
 });
 
-refreshStatus();
+applyScenarioBtn.addEventListener("click", () => {
+  const selected = scenarios.find((item) => item.id === scenarioSelect.value);
+  if (selected) {
+    hydrateForm(selected.payload);
+  }
+});
+
+async function bootstrap() {
+  try {
+    await loadScenarios();
+    if (scenarios.length > 0) {
+      hydrateForm(scenarios[0].payload);
+    }
+    await refreshStatus();
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+bootstrap();

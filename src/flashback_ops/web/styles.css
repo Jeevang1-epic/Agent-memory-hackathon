@@ -120,6 +120,12 @@ label {
   font-size: 0.95rem;
 }
 
+.scenario-row {
+  display: grid;
+  gap: 0.55rem;
+  grid-template-columns: 1fr auto;
+}
+
 input,
 textarea,
 select {

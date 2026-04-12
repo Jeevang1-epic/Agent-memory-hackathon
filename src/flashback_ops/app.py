@@ -88,3 +88,8 @@ def seed() -> SeedResponse:
 @app.get("/api/memory/stats")
 def memory_stats() -> dict:
     return store.stats()
+
+
+@app.get("/api/demo/scenarios")
+def demo_scenarios() -> list[dict]:
+    return service.demo_scenarios()
