@@ -8,6 +8,7 @@ env/
 *.egg-info/
 _source_docs/
 .codex/
+.local_archive/
 data/memory.json
 data/.runtime/
 Thumbs.db

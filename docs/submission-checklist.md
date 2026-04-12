@@ -7,8 +7,7 @@
 - [x] Demo-ready web interface
 - [x] Explanation of how memory is used
 - [x] Technical article draft (`article.md`)
-- [x] LinkedIn post draft (`docs/linkedin-post.md`)
-- [x] Video script + title set (`docs/video-script.md`)
+- [x] LinkedIn + video content prepared locally (not committed to public repo)
 - [x] Project documentary (`docs/project-documentary.md`)
 
 ## Judging Alignment

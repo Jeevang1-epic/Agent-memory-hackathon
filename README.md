@@ -90,12 +90,9 @@ Reference simulation output:
 ## Submission Assets
 
 - Technical article: [`article.md`](article.md)
-- LinkedIn post draft: [`docs/linkedin-post.md`](docs/linkedin-post.md)
-- Video script and titles: [`docs/video-script.md`](docs/video-script.md)
 - Project documentary: [`docs/project-documentary.md`](docs/project-documentary.md)
 - Submission checklist: [`docs/submission-checklist.md`](docs/submission-checklist.md)
 - API reference: [`docs/api-reference.md`](docs/api-reference.md)
-- Presentation outline: [`docs/presentation-outline.md`](docs/presentation-outline.md)
 
 ## Team
 
