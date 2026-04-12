@@ -31,18 +31,7 @@ It turns previous outages, fixes, and postmortem lessons into ranked recovery pl
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    A[Web UI] --> B[FastAPI Service]
-    B --> C[Plan Generator]
-    C --> D[No-Memory Baseline]
-    C --> E[Memory-Augmented Plan]
-    B --> F[Memory Adapter]
-    F --> G[Local Persistent Store]
-    F --> H[Hindsight API]
-    B --> I[Feedback Retain Loop]
-    I --> F
-```
+![Architecture](assets/architecture.svg)
 
 ## Tech Stack
 
@@ -95,6 +84,8 @@ Reference simulation output:
 - Scenario 2 memory boost: `+0.46`
 - Scenario 3 memory boost: `+0.48`
 - Average memory boost: `+0.477`
+
+![Memory Boost Curve](assets/memory-boost-curve.svg)
 
 ## Submission Assets
 
