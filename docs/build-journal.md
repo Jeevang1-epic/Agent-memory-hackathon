@@ -26,3 +26,4 @@ This log tracks rapid polish passes applied after core delivery.
 - Pass 22: tightened wording and sequencing for smoother reviewer reading flow.
 - Pass 23: tightened wording and sequencing for smoother reviewer reading flow.
 - Pass 24: tightened wording and sequencing for smoother reviewer reading flow.
+- Pass 25: tightened wording and sequencing for smoother reviewer reading flow.
