@@ -45,7 +45,7 @@ It turns previous outages, fixes, and postmortem lessons into ranked recovery pl
 
 ```bash
 python -m pip install -e .[dev]
-python -m flashback_ops
+powershell -ExecutionPolicy Bypass -File .\run.ps1
 ```
 
 App URL: `http://127.0.0.1:8000`
@@ -95,6 +95,7 @@ Reference simulation output:
 - Project documentary: [`docs/project-documentary.md`](docs/project-documentary.md)
 - Submission checklist: [`docs/submission-checklist.md`](docs/submission-checklist.md)
 - API reference: [`docs/api-reference.md`](docs/api-reference.md)
+- Presentation outline: [`docs/presentation-outline.md`](docs/presentation-outline.md)
 
 ## Team
 
