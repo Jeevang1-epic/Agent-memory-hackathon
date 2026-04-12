@@ -37,3 +37,4 @@ This log tracks rapid polish passes applied after core delivery.
 - Pass 33: tightened wording and sequencing for smoother reviewer reading flow.
 - Pass 34: tightened wording and sequencing for smoother reviewer reading flow.
 - Pass 35: tightened wording and sequencing for smoother reviewer reading flow.
+- Pass 36: tightened wording and sequencing for smoother reviewer reading flow.
