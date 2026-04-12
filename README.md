@@ -86,6 +86,7 @@ App URL: `http://127.0.0.1:8000`
 ```bash
 python -m pytest -q --basetemp "C:\Users\Jeevan kumar\AppData\Local\Temp\flashback_pytest"
 python scripts/evaluate_learning_curve.py
+python scripts/live_demo_sequence.py
 ```
 
 Reference simulation output:
@@ -102,6 +103,7 @@ Reference simulation output:
 - Video script and titles: [`docs/video-script.md`](docs/video-script.md)
 - Project documentary: [`docs/project-documentary.md`](docs/project-documentary.md)
 - Submission checklist: [`docs/submission-checklist.md`](docs/submission-checklist.md)
+- API reference: [`docs/api-reference.md`](docs/api-reference.md)
 
 ## Team
 
