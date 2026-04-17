@@ -88,3 +88,16 @@ class StatusResponse(BaseModel):
     memory_entries: int
     sessions: int
     available: bool
+
+
+class SubscriptionRequest(BaseModel):
+    email: str = Field(min_length=5, max_length=254)
+    team_name: str = Field(min_length=2, max_length=120)
+    team_size: int = Field(ge=1, le=500)
+    plan: Literal["starter", "growth", "enterprise"] = "growth"
+    use_case: str = Field(default="", max_length=800)
+
+
+class SubscriptionResponse(BaseModel):
+    status: str
+    record_id: str
