@@ -17,6 +17,8 @@ from .models import (
     IncidentCreateResponse,
     SeedResponse,
     StatusResponse,
+    SubscriptionRequest,
+    SubscriptionResponse,
 )
 from .service import IncidentService
 
@@ -32,7 +34,7 @@ if settings.memory_backend.lower() == "hindsight":
     )
 else:
     store = local_store
-service = IncidentService(store=store)
+service = IncidentService(store=store, subscriptions_file=settings.subscriptions_file)
 
 app = FastAPI(title=settings.app_name, version="0.1.0")
 app.add_middleware(
@@ -93,3 +95,8 @@ def memory_stats() -> dict:
 @app.get("/api/demo/scenarios")
 def demo_scenarios() -> list[dict]:
     return service.demo_scenarios()
+
+
+@app.post("/api/subscriptions", response_model=SubscriptionResponse)
+def subscribe(payload: SubscriptionRequest) -> SubscriptionResponse:
+    return service.subscribe(payload)
