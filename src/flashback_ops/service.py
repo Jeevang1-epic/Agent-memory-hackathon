@@ -19,6 +19,7 @@ from .models import (
     SeedResponse,
     SubscriptionRequest,
     SubscriptionResponse,
+    SubscriptionStatsResponse,
 )
 from .reasoning import build_plan_bundle
 
@@ -307,12 +308,17 @@ class IncidentService:
         self.subscriptions_file.write_text(json.dumps(records, indent=2, ensure_ascii=True), encoding="utf-8")
 
     def subscribe(self, request: SubscriptionRequest) -> SubscriptionResponse:
-        record_id = f"sub-{uuid4().hex[:10]}"
         records = self._read_subscriptions()
+        normalized_email = request.email.strip().lower()
+        normalized_team = request.team_name.strip().lower()
+        for record in records:
+            if record.get("email") == normalized_email and str(record.get("team_name", "")).strip().lower() == normalized_team:
+                return SubscriptionResponse(status="already_registered", record_id=str(record.get("record_id", "")))
+        record_id = f"sub-{uuid4().hex[:10]}"
         records.append(
             {
                 "record_id": record_id,
-                "email": request.email.strip().lower(),
+                "email": normalized_email,
                 "team_name": request.team_name.strip(),
                 "team_size": request.team_size,
                 "plan": request.plan,
@@ -322,3 +328,12 @@ class IncidentService:
         )
         self._write_subscriptions(records)
         return SubscriptionResponse(status="queued", record_id=record_id)
+
+    def subscription_stats(self) -> SubscriptionStatsResponse:
+        records = self._read_subscriptions()
+        counts = {"starter": 0, "growth": 0, "enterprise": 0}
+        for record in records:
+            plan = str(record.get("plan", "")).strip().lower()
+            if plan in counts:
+                counts[plan] += 1
+        return SubscriptionStatsResponse(total=len(records), starter=counts["starter"], growth=counts["growth"], enterprise=counts["enterprise"])
