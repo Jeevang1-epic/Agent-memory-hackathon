@@ -55,6 +55,25 @@
         </article>
       </section>
 
+      <section class="roadmap-row">
+        <article class="roadmap-card">
+          <h3>Product Roadmap</h3>
+          <ul>
+            <li>Voice-enabled incident briefs for on-call rooms</li>
+            <li>Slack and PagerDuty native integrations</li>
+            <li>Incident family clustering and blast-radius prediction</li>
+          </ul>
+        </article>
+        <article class="roadmap-card">
+          <h3>Operator Tips</h3>
+          <ul>
+            <li>Use one symptom per line with exact service wording.</li>
+            <li>Add top logs and stack clues before running plan generation.</li>
+            <li>Close every incident with feedback to improve future recall.</li>
+          </ul>
+        </article>
+      </section>
+
       <section class="layout">
         <form id="assistForm" class="panel">
           <h2>Incident Intake</h2>
@@ -95,7 +114,7 @@ redis pool saturation alerts</textarea>
             <input name="tags" value="redis,checkout,timeouts" />
           </label>
           <div class="form-actions">
-            <button type="submit" class="btn primary full">Run Memory-Assisted Plan</button>
+            <button type="submit" id="runPlanBtn" class="btn primary full">Run Memory-Assisted Plan</button>
           </div>
         </form>
 
@@ -146,26 +165,28 @@ redis pool saturation alerts</textarea>
       </section>
 
       <section class="panel split-bottom">
-        <h2>Feedback Loop</h2>
-        <form id="feedbackForm">
-          <input type="hidden" name="query_id" />
-          <input type="hidden" name="session_id" />
-          <label>Outcome
-            <select name="outcome">
-              <option value="resolved">resolved</option>
-              <option value="partial">partial</option>
-              <option value="failed">failed</option>
-              <option value="unknown">unknown</option>
-            </select>
-          </label>
-          <label>Useful Steps (one per line)
-            <textarea name="useful_steps" rows="3"></textarea>
-          </label>
-          <label>Notes
-            <textarea name="notes" rows="3"></textarea>
-          </label>
-          <button type="submit" class="btn">Save Feedback to Memory</button>
-        </form>
+        <article class="subpanel">
+          <h2>Feedback Loop</h2>
+          <form id="feedbackForm">
+            <input type="hidden" name="query_id" />
+            <input type="hidden" name="session_id" />
+            <label>Outcome
+              <select name="outcome">
+                <option value="resolved">resolved</option>
+                <option value="partial">partial</option>
+                <option value="failed">failed</option>
+                <option value="unknown">unknown</option>
+              </select>
+            </label>
+            <label>Useful Steps (one per line)
+              <textarea name="useful_steps" rows="3"></textarea>
+            </label>
+            <label>Notes
+              <textarea name="notes" rows="3"></textarea>
+            </label>
+            <button type="submit" id="saveFeedbackBtn" class="btn">Save Feedback to Memory</button>
+          </form>
+        </article>
 
         <form id="subscriptionForm" class="subscription">
           <h2>Request SaaS Access</h2>
@@ -193,7 +214,7 @@ redis pool saturation alerts</textarea>
           <label>Primary Use Case
             <textarea name="use_case" rows="3" placeholder="Tell us what incidents you want this to handle first."></textarea>
           </label>
-          <button type="submit" class="btn primary">Request Access</button>
+          <button type="submit" id="requestAccessBtn" class="btn primary">Request Access</button>
         </form>
       </section>
     </main>
