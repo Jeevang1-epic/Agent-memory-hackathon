@@ -1,7 +1,8 @@
 const assistForm = document.getElementById("assistForm");
 const feedbackForm = document.getElementById("feedbackForm");
-const statusBtn = document.getElementById("statusBtn");
+const subscriptionForm = document.getElementById("subscriptionForm");
 const seedBtn = document.getElementById("seedBtn");
+const freshBtn = document.getElementById("freshBtn");
 const scenarioSelect = document.getElementById("scenarioSelect");
 const applyScenarioBtn = document.getElementById("applyScenarioBtn");
 const backendValue = document.getElementById("backendValue");
@@ -16,22 +17,26 @@ const takeawayList = document.getElementById("takeawayList");
 const memoryTableBody = document.getElementById("memoryTableBody");
 const copyWithoutBtn = document.getElementById("copyWithoutBtn");
 const copyWithBtn = document.getElementById("copyWithBtn");
+const toast = document.getElementById("toast");
 let scenarios = [];
 
 async function callApi(path, payload = null, method = "GET") {
-  const init = {
-    method,
-    headers: {
-      "Content-Type": "application/json"
-    }
-  };
+  const init = { method, headers: {} };
   if (payload) {
+    init.headers["Content-Type"] = "application/json";
     init.body = JSON.stringify(payload);
   }
   const response = await fetch(path, init);
   if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || "request failed");
+    let message = "Request failed";
+    try {
+      const parsed = await response.json();
+      message = parsed.detail || parsed.message || message;
+    } catch {
+      const raw = await response.text();
+      message = raw || message;
+    }
+    throw new Error(message);
   }
   return response.json();
 }
@@ -84,6 +89,20 @@ function setFeedbackContext(payload) {
   feedbackForm.elements.session_id.value = payload.session_id;
 }
 
+function clearFeedbackContext() {
+  feedbackForm.elements.query_id.value = "";
+  feedbackForm.elements.session_id.value = "";
+}
+
+function showToast(message) {
+  toast.textContent = message;
+  toast.classList.add("show");
+  clearTimeout(showToast.timeoutId);
+  showToast.timeoutId = window.setTimeout(() => {
+    toast.classList.remove("show");
+  }, 2200);
+}
+
 async function refreshStatus() {
   const payload = await callApi("/api/status");
   backendValue.textContent = payload.backend;
@@ -98,6 +117,27 @@ function hydrateForm(payload) {
   assistForm.elements.symptoms.value = (payload.symptoms || []).join("\n");
   assistForm.elements.logs.value = payload.logs || "";
   assistForm.elements.tags.value = (payload.tags || []).join(", ");
+}
+
+function resetOutputs() {
+  boostValue.textContent = "0.00";
+  withoutConfidence.textContent = "Confidence 0.00";
+  withConfidence.textContent = "Confidence 0.00";
+  withoutSteps.innerHTML = "";
+  withSteps.innerHTML = "";
+  takeawayList.innerHTML = "";
+  memoryTableBody.innerHTML = "";
+  feedbackForm.elements.useful_steps.value = "";
+  feedbackForm.elements.notes.value = "";
+  clearFeedbackContext();
+}
+
+function freshWorkspace() {
+  const selected = scenarios.find((item) => item.id === scenarioSelect.value) || scenarios[0];
+  if (selected) {
+    hydrateForm(selected.payload);
+  }
+  resetOutputs();
 }
 
 async function loadScenarios() {
@@ -133,8 +173,9 @@ assistForm.addEventListener("submit", async (event) => {
     renderMemoryRows(response.recalled_memories);
     setFeedbackContext(response);
     await refreshStatus();
+    showToast("Plan generated");
   } catch (error) {
-    alert(error.message);
+    showToast(error.message);
   }
 });
 
@@ -143,7 +184,7 @@ feedbackForm.addEventListener("submit", async (event) => {
   const queryId = feedbackForm.elements.query_id.value.trim();
   const sessionId = feedbackForm.elements.session_id.value.trim();
   if (!queryId || !sessionId) {
-    alert("Run an assist call first.");
+    showToast("Run an assist call first");
     return;
   }
   const payload = {
@@ -158,16 +199,27 @@ feedbackForm.addEventListener("submit", async (event) => {
     feedbackForm.elements.useful_steps.value = "";
     feedbackForm.elements.notes.value = "";
     await refreshStatus();
+    showToast("Feedback saved to memory");
   } catch (error) {
-    alert(error.message);
+    showToast(error.message);
   }
 });
 
-statusBtn.addEventListener("click", async () => {
+subscriptionForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const payload = {
+    email: subscriptionForm.elements.email.value.trim(),
+    team_name: subscriptionForm.elements.team_name.value.trim(),
+    team_size: Number(subscriptionForm.elements.team_size.value),
+    plan: subscriptionForm.elements.plan.value,
+    use_case: subscriptionForm.elements.use_case.value.trim()
+  };
   try {
-    await refreshStatus();
+    await callApi("/api/subscriptions", payload, "POST");
+    subscriptionForm.reset();
+    showToast("Access request queued");
   } catch (error) {
-    alert(error.message);
+    showToast(error.message);
   }
 });
 
@@ -175,8 +227,9 @@ seedBtn.addEventListener("click", async () => {
   try {
     await callApi("/api/seed", {}, "POST");
     await refreshStatus();
+    showToast("Memory loaded");
   } catch (error) {
-    alert(error.message);
+    showToast(error.message);
   }
 });
 
@@ -184,28 +237,63 @@ applyScenarioBtn.addEventListener("click", () => {
   const selected = scenarios.find((item) => item.id === scenarioSelect.value);
   if (selected) {
     hydrateForm(selected.payload);
+    showToast("Scenario applied");
+  }
+});
+
+freshBtn.addEventListener("click", async () => {
+  try {
+    freshWorkspace();
+    await refreshStatus();
+    showToast("Workspace refreshed");
+  } catch (error) {
+    showToast(error.message);
   }
 });
 
 copyWithoutBtn.addEventListener("click", async () => {
-  const text = listText(Array.from(withoutSteps.querySelectorAll("li")).map((node) => node.textContent || ""));
-  await navigator.clipboard.writeText(text);
+  const text = listText(Array.from(withoutSteps.querySelectorAll("li")).map((node) => node.textContent || "").filter(Boolean));
+  if (!text) {
+    showToast("No baseline steps yet");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("Baseline steps copied");
+  } catch {
+    showToast("Clipboard blocked in this browser");
+  }
 });
 
 copyWithBtn.addEventListener("click", async () => {
-  const text = listText(Array.from(withSteps.querySelectorAll("li")).map((node) => node.textContent || ""));
-  await navigator.clipboard.writeText(text);
+  const text = listText(Array.from(withSteps.querySelectorAll("li")).map((node) => node.textContent || "").filter(Boolean));
+  if (!text) {
+    showToast("No memory steps yet");
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast("Memory steps copied");
+  } catch {
+    showToast("Clipboard blocked in this browser");
+  }
+});
+
+document.addEventListener("mousemove", (event) => {
+  const x = (event.clientX / window.innerWidth) * 2 - 1;
+  const y = (event.clientY / window.innerHeight) * 2 - 1;
+  document.documentElement.style.setProperty("--mx", x.toFixed(3));
+  document.documentElement.style.setProperty("--my", y.toFixed(3));
 });
 
 async function bootstrap() {
   try {
     await loadScenarios();
-    if (scenarios.length > 0) {
-      hydrateForm(scenarios[0].payload);
-    }
+    freshWorkspace();
     await refreshStatus();
+    showToast("Workspace ready");
   } catch (error) {
-    alert(error.message);
+    showToast(error.message);
   }
 }
 
