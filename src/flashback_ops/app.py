@@ -19,6 +19,7 @@ from .models import (
     StatusResponse,
     SubscriptionRequest,
     SubscriptionResponse,
+    SubscriptionStatsResponse,
 )
 from .service import IncidentService
 
@@ -100,3 +101,8 @@ def demo_scenarios() -> list[dict]:
 @app.post("/api/subscriptions", response_model=SubscriptionResponse)
 def subscribe(payload: SubscriptionRequest) -> SubscriptionResponse:
     return service.subscribe(payload)
+
+
+@app.get("/api/subscriptions/stats", response_model=SubscriptionStatsResponse)
+def subscription_stats() -> SubscriptionStatsResponse:
+    return service.subscription_stats()
