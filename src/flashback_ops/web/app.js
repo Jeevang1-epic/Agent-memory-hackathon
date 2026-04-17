@@ -3,6 +3,9 @@ const feedbackForm = document.getElementById("feedbackForm");
 const subscriptionForm = document.getElementById("subscriptionForm");
 const seedBtn = document.getElementById("seedBtn");
 const freshBtn = document.getElementById("freshBtn");
+const runPlanBtn = document.getElementById("runPlanBtn");
+const saveFeedbackBtn = document.getElementById("saveFeedbackBtn");
+const requestAccessBtn = document.getElementById("requestAccessBtn");
 const scenarioSelect = document.getElementById("scenarioSelect");
 const applyScenarioBtn = document.getElementById("applyScenarioBtn");
 const backendValue = document.getElementById("backendValue");
@@ -18,6 +21,7 @@ const memoryTableBody = document.getElementById("memoryTableBody");
 const copyWithoutBtn = document.getElementById("copyWithoutBtn");
 const copyWithBtn = document.getElementById("copyWithBtn");
 const toast = document.getElementById("toast");
+const FORM_STATE_KEY = "flashback_ops_form_state_v1";
 let scenarios = [];
 
 async function callApi(path, payload = null, method = "GET") {
@@ -103,6 +107,18 @@ function showToast(message) {
   }, 2200);
 }
 
+async function withButtonBusy(button, busyText, task) {
+  const previous = button.textContent;
+  button.disabled = true;
+  button.textContent = busyText;
+  try {
+    return await task();
+  } finally {
+    button.disabled = false;
+    button.textContent = previous;
+  }
+}
+
 async function refreshStatus() {
   const payload = await callApi("/api/status");
   backendValue.textContent = payload.backend;
@@ -119,6 +135,41 @@ function hydrateForm(payload) {
   assistForm.elements.tags.value = (payload.tags || []).join(", ");
 }
 
+function saveFormState() {
+  const state = {
+    service: assistForm.elements.service.value,
+    severity: assistForm.elements.severity.value,
+    objective: assistForm.elements.objective.value,
+    symptoms: assistForm.elements.symptoms.value,
+    logs: assistForm.elements.logs.value,
+    tags: assistForm.elements.tags.value,
+    scenario: scenarioSelect.value
+  };
+  localStorage.setItem(FORM_STATE_KEY, JSON.stringify(state));
+}
+
+function restoreFormState() {
+  const raw = localStorage.getItem(FORM_STATE_KEY);
+  if (!raw) {
+    return false;
+  }
+  try {
+    const state = JSON.parse(raw);
+    assistForm.elements.service.value = state.service || assistForm.elements.service.value;
+    assistForm.elements.severity.value = state.severity || assistForm.elements.severity.value;
+    assistForm.elements.objective.value = state.objective || assistForm.elements.objective.value;
+    assistForm.elements.symptoms.value = state.symptoms || assistForm.elements.symptoms.value;
+    assistForm.elements.logs.value = state.logs || assistForm.elements.logs.value;
+    assistForm.elements.tags.value = state.tags || assistForm.elements.tags.value;
+    if (state.scenario && scenarios.some((item) => item.id === state.scenario)) {
+      scenarioSelect.value = state.scenario;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function resetOutputs() {
   boostValue.textContent = "0.00";
   withoutConfidence.textContent = "Confidence 0.00";
@@ -132,12 +183,17 @@ function resetOutputs() {
   clearFeedbackContext();
 }
 
-function freshWorkspace() {
+function freshWorkspace(clearSaved = false) {
   const selected = scenarios.find((item) => item.id === scenarioSelect.value) || scenarios[0];
   if (selected) {
     hydrateForm(selected.payload);
   }
   resetOutputs();
+  if (clearSaved) {
+    localStorage.removeItem(FORM_STATE_KEY);
+  } else {
+    saveFormState();
+  }
 }
 
 async function loadScenarios() {
@@ -163,7 +219,7 @@ assistForm.addEventListener("submit", async (event) => {
     top_k: 4
   };
   try {
-    const response = await callApi("/api/assist", payload, "POST");
+    const response = await withButtonBusy(runPlanBtn, "Running...", async () => callApi("/api/assist", payload, "POST"));
     boostValue.textContent = response.memory_boost.toFixed(2);
     withoutConfidence.textContent = `Confidence ${response.without_memory.confidence.toFixed(2)}`;
     withConfidence.textContent = `Confidence ${response.with_memory.confidence.toFixed(2)}`;
@@ -172,6 +228,7 @@ assistForm.addEventListener("submit", async (event) => {
     renderList(takeawayList, response.tactical_takeaways, false);
     renderMemoryRows(response.recalled_memories);
     setFeedbackContext(response);
+    saveFormState();
     await refreshStatus();
     showToast("Plan generated");
   } catch (error) {
@@ -195,7 +252,7 @@ feedbackForm.addEventListener("submit", async (event) => {
     notes: feedbackForm.elements.notes.value.trim()
   };
   try {
-    await callApi("/api/feedback", payload, "POST");
+    await withButtonBusy(saveFeedbackBtn, "Saving...", async () => callApi("/api/feedback", payload, "POST"));
     feedbackForm.elements.useful_steps.value = "";
     feedbackForm.elements.notes.value = "";
     await refreshStatus();
@@ -215,7 +272,7 @@ subscriptionForm.addEventListener("submit", async (event) => {
     use_case: subscriptionForm.elements.use_case.value.trim()
   };
   try {
-    await callApi("/api/subscriptions", payload, "POST");
+    await withButtonBusy(requestAccessBtn, "Submitting...", async () => callApi("/api/subscriptions", payload, "POST"));
     subscriptionForm.reset();
     showToast("Access request queued");
   } catch (error) {
@@ -225,7 +282,7 @@ subscriptionForm.addEventListener("submit", async (event) => {
 
 seedBtn.addEventListener("click", async () => {
   try {
-    await callApi("/api/seed", {}, "POST");
+    await withButtonBusy(seedBtn, "Loading...", async () => callApi("/api/seed", {}, "POST"));
     await refreshStatus();
     showToast("Memory loaded");
   } catch (error) {
@@ -237,17 +294,33 @@ applyScenarioBtn.addEventListener("click", () => {
   const selected = scenarios.find((item) => item.id === scenarioSelect.value);
   if (selected) {
     hydrateForm(selected.payload);
+    saveFormState();
     showToast("Scenario applied");
   }
 });
 
 freshBtn.addEventListener("click", async () => {
   try {
-    freshWorkspace();
+    freshWorkspace(true);
     await refreshStatus();
     showToast("Workspace refreshed");
   } catch (error) {
     showToast(error.message);
+  }
+});
+
+assistForm.addEventListener("input", () => {
+  saveFormState();
+});
+
+assistForm.addEventListener("change", () => {
+  saveFormState();
+});
+
+assistForm.addEventListener("keydown", (event) => {
+  if ((event.ctrlKey || event.metaKey) && event.key === "Enter") {
+    event.preventDefault();
+    assistForm.requestSubmit();
   }
 });
 
@@ -280,6 +353,12 @@ copyWithBtn.addEventListener("click", async () => {
 });
 
 document.addEventListener("mousemove", (event) => {
+  const target = event.target;
+  if (target instanceof Element && target.closest("input,textarea,select,button,label,a,table,thead,tbody,tr,td")) {
+    document.documentElement.style.setProperty("--mx", "0");
+    document.documentElement.style.setProperty("--my", "0");
+    return;
+  }
   const x = (event.clientX / window.innerWidth) * 2 - 1;
   const y = (event.clientY / window.innerHeight) * 2 - 1;
   document.documentElement.style.setProperty("--mx", x.toFixed(3));
@@ -289,7 +368,9 @@ document.addEventListener("mousemove", (event) => {
 async function bootstrap() {
   try {
     await loadScenarios();
-    freshWorkspace();
+    if (!restoreFormState()) {
+      freshWorkspace();
+    }
     await refreshStatus();
     showToast("Workspace ready");
   } catch (error) {
