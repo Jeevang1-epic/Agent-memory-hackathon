@@ -161,6 +161,28 @@ body {
   background: linear-gradient(145deg, rgba(6, 20, 46, 0.9), rgba(25, 22, 55, 0.76));
 }
 
+.roadmap-row {
+  display: grid;
+  gap: 0.8rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.roadmap-card {
+  border: 1px solid var(--border);
+  background: var(--surface-soft);
+  border-radius: 0.9rem;
+  padding: 0.95rem 1rem;
+  box-shadow: var(--shadow);
+}
+
+.roadmap-card h3 {
+  margin: 0;
+}
+
+.roadmap-card ul {
+  margin-top: 0.55rem;
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(300px, 420px) minmax(0, 1fr);
@@ -250,6 +272,12 @@ textarea {
 
 .btn:active {
   transform: translateY(0);
+}
+
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
 }
 
 .btn.primary {
@@ -351,10 +379,21 @@ th {
   font-size: 0.88rem;
 }
 
+tbody tr:hover {
+  background: rgba(15, 23, 42, 0.42);
+}
+
 .split-bottom {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 1rem;
+}
+
+.subpanel {
+  border: 1px solid var(--border);
+  border-radius: 0.8rem;
+  padding: 0.95rem;
+  background: rgba(5, 13, 27, 0.54);
 }
 
 .subscription {
@@ -394,6 +433,7 @@ th {
   .cards,
   .status-row,
   .feature-grid,
+  .roadmap-row,
   .field-row,
   .split-bottom {
     grid-template-columns: 1fr;
