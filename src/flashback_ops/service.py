@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
+import json
+from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
@@ -15,6 +17,8 @@ from .models import (
     MemoryHitView,
     PlanCard,
     SeedResponse,
+    SubscriptionRequest,
+    SubscriptionResponse,
 )
 from .reasoning import build_plan_bundle
 
@@ -23,9 +27,10 @@ OUTCOME_SCORE = {"resolved": 1.0, "partial": 0.65, "failed": 0.2, "unknown": 0.5
 
 
 class IncidentService:
-    def __init__(self, store: MemoryStore):
+    def __init__(self, store: MemoryStore, subscriptions_file: Path | None = None):
         self.store = store
         self.sessions: dict[str, dict[str, Any]] = {}
+        self.subscriptions_file = subscriptions_file
 
     def _now(self) -> str:
         return datetime.now(UTC).isoformat()
@@ -281,3 +286,39 @@ class IncidentService:
             "sessions": len(self.sessions),
             "available": True,
         }
+
+    def _read_subscriptions(self) -> list[dict[str, Any]]:
+        if not self.subscriptions_file:
+            return []
+        if not self.subscriptions_file.exists():
+            return []
+        try:
+            payload = json.loads(self.subscriptions_file.read_text(encoding="utf-8"))
+            if isinstance(payload, list):
+                return [item for item in payload if isinstance(item, dict)]
+        except (OSError, json.JSONDecodeError):
+            return []
+        return []
+
+    def _write_subscriptions(self, records: list[dict[str, Any]]) -> None:
+        if not self.subscriptions_file:
+            return
+        self.subscriptions_file.parent.mkdir(parents=True, exist_ok=True)
+        self.subscriptions_file.write_text(json.dumps(records, indent=2, ensure_ascii=True), encoding="utf-8")
+
+    def subscribe(self, request: SubscriptionRequest) -> SubscriptionResponse:
+        record_id = f"sub-{uuid4().hex[:10]}"
+        records = self._read_subscriptions()
+        records.append(
+            {
+                "record_id": record_id,
+                "email": request.email.strip().lower(),
+                "team_name": request.team_name.strip(),
+                "team_size": request.team_size,
+                "plan": request.plan,
+                "use_case": request.use_case.strip(),
+                "created_at": self._now(),
+            }
+        )
+        self._write_subscriptions(records)
+        return SubscriptionResponse(status="queued", record_id=record_id)
