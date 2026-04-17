@@ -31,3 +31,4 @@
 - Pass 70: interaction polish review completed for dashboard, forms, and workflow clarity.
 - Pass 71: interaction review completed after verification run.
 - Pass 72: layout refinement completed after verification run.
+- Pass 73: copy clarity pass completed after verification run.
