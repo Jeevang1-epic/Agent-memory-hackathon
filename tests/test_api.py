@@ -52,3 +52,16 @@ def test_seed_assist_feedback_flow(tmp_path: Path, monkeypatch) -> None:
     status = client.get("/api/status")
     assert status.status_code == 200
     assert status.json()["memory_entries"] >= 7
+
+    subscription = client.post(
+        "/api/subscriptions",
+        json={
+            "email": "oncall@example.com",
+            "team_name": "Platform Reliability",
+            "team_size": 12,
+            "plan": "growth",
+            "use_case": "incident response memory intelligence",
+        },
+    )
+    assert subscription.status_code == 200
+    assert subscription.json()["status"] == "queued"
