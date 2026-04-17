@@ -10,6 +10,8 @@ _source_docs/
 .codex/
 .local_archive/
 data/memory.json
+data/subscriptions.json
 data/.runtime/
+images/Screenshot*.png
 Thumbs.db
 .DS_Store

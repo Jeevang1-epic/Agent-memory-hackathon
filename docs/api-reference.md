@@ -107,3 +107,28 @@ Response:
   "memory_id": "feedback::..."
 }
 ```
+
+## `POST /api/subscriptions`
+
+Queues a team for hosted SaaS access.
+
+Request body:
+
+```json
+{
+  "email": "oncall@company.com",
+  "team_name": "Platform Reliability",
+  "team_size": 12,
+  "plan": "growth",
+  "use_case": "incident response for payment and auth services"
+}
+```
+
+Response:
+
+```json
+{
+  "status": "queued",
+  "record_id": "sub-1234567890"
+}
+```

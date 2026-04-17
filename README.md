@@ -56,6 +56,7 @@ App URL: `http://127.0.0.1:8000`
 | --- | --- | --- |
 | `FLASHBACK_MEMORY_BACKEND` | `local` | `local` or `hindsight` |
 | `FLASHBACK_DATA_FILE` | `data/memory.json` | Local memory persistence path |
+| `FLASHBACK_SUBSCRIPTIONS_FILE` | `data/subscriptions.json` | Stores SaaS waitlist requests |
 | `FLASHBACK_MAX_RECALL` | `5` | Max recall candidates |
 | `HINDSIGHT_BASE_URL` | empty | Hindsight API base URL |
 | `HINDSIGHT_API_KEY` | empty | Hindsight auth token |
@@ -67,8 +68,15 @@ App URL: `http://127.0.0.1:8000`
 - `POST /api/incidents` retain one incident memory
 - `POST /api/assist` generate baseline vs memory plan
 - `POST /api/feedback` retain resolution feedback
+- `POST /api/subscriptions` capture SaaS access requests
 - `GET /api/status` runtime snapshot
 - `GET /api/memory/stats` memory distribution
+
+## Vercel Deployment
+
+- `vercel.json` routes all requests to `api/index.py`
+- `api/index.py` loads the FastAPI app from `src/flashback_ops/app.py`
+- Ready for serverless deploy on Vercel with Python runtime
 
 ## Quality Gates
 
