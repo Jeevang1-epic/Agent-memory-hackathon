@@ -101,3 +101,10 @@ class SubscriptionRequest(BaseModel):
 class SubscriptionResponse(BaseModel):
     status: str
     record_id: str
+
+
+class SubscriptionStatsResponse(BaseModel):
+    total: int
+    starter: int
+    growth: int
+    enterprise: int
