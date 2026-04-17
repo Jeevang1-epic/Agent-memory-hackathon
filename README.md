@@ -28,6 +28,9 @@ It turns previous outages, fixes, and postmortem lessons into ranked recovery pl
 - Confidence delta makes the value of memory measurable in real time.
 - Feedback from resolved incidents is retained as new memory.
 - Hindsight backend mode is available with fallback so the demo still runs instantly.
+- SaaS access requests can be captured from the app UI.
+- Operator form state is restored automatically between refreshes.
+- `Ctrl+Enter` or `Cmd+Enter` runs plan generation from the incident form.
 
 ## Architecture
 
@@ -50,6 +53,13 @@ powershell -ExecutionPolicy Bypass -File .\run.ps1
 
 App URL: `http://127.0.0.1:8000`
 
+## UI Preview
+
+![Dashboard](images/ui/01-dashboard.png)
+![Plan View](images/ui/02-plan-view.png)
+![Subscription](images/ui/03-subscription.png)
+![Mobile](images/ui/04-mobile.png)
+
 ## Environment Variables
 
 | Variable | Default | Purpose |
@@ -69,6 +79,7 @@ App URL: `http://127.0.0.1:8000`
 - `POST /api/assist` generate baseline vs memory plan
 - `POST /api/feedback` retain resolution feedback
 - `POST /api/subscriptions` capture SaaS access requests
+- `GET /api/subscriptions/stats` subscription plan distribution
 - `GET /api/status` runtime snapshot
 - `GET /api/memory/stats` memory distribution
 
@@ -76,6 +87,7 @@ App URL: `http://127.0.0.1:8000`
 
 - `vercel.json` routes all requests to `api/index.py`
 - `api/index.py` loads the FastAPI app from `src/flashback_ops/app.py`
+- `requirements.txt` is included for dependency install on Vercel
 - Ready for serverless deploy on Vercel with Python runtime
 
 ## Quality Gates

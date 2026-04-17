@@ -132,3 +132,27 @@ Response:
   "record_id": "sub-1234567890"
 }
 ```
+
+If the same email and team already exists:
+
+```json
+{
+  "status": "already_registered",
+  "record_id": "sub-1234567890"
+}
+```
+
+## `GET /api/subscriptions/stats`
+
+Returns subscription totals by plan.
+
+Response:
+
+```json
+{
+  "total": 4,
+  "starter": 1,
+  "growth": 2,
+  "enterprise": 1
+}
+```
