@@ -8,18 +8,20 @@
   </head>
   <body>
     <div class="background-grid"></div>
+    <div class="ambient ambient-a"></div>
+    <div class="ambient ambient-b"></div>
     <main class="shell">
       <header class="hero">
         <div>
           <p class="eyebrow">Hindsight Agent Memory</p>
           <h1>Flashback Ops</h1>
           <p class="subtitle">
-            Incident response copilot that learns from every outage and shows a clear memory vs no-memory delta.
+            Incident response workspace for engineering teams. Learn from every outage, recover faster, and keep response quality consistent.
           </p>
         </div>
         <div class="hero-actions">
-          <button id="seedBtn" class="btn primary">Load Demo Memory</button>
-          <button id="statusBtn" class="btn">Refresh Status</button>
+          <button id="seedBtn" class="btn primary" type="button">Load Memory</button>
+          <button id="freshBtn" class="btn" type="button">Fresh</button>
         </div>
       </header>
 
@@ -38,41 +40,63 @@
         </div>
       </section>
 
+      <section class="feature-grid">
+        <article class="feature-card">
+          <h3>Context-Aware Plans</h3>
+          <p>Runbook suggestions are ranked against your historical incident wins and misses.</p>
+        </article>
+        <article class="feature-card">
+          <h3>Learning Loop</h3>
+          <p>Each incident closes with feedback, so response quality compounds over time.</p>
+        </article>
+        <article class="feature-card voice-soon">
+          <h3>Voice Ops Soon</h3>
+          <p>Next release adds voice-first command and briefing mode for on-call rooms.</p>
+        </article>
+      </section>
+
       <section class="layout">
         <form id="assistForm" class="panel">
-          <h2>New Incident Signal</h2>
+          <h2>Incident Intake</h2>
+          <p class="helper">Pick a preset or fill manually. Keep symptoms short and concrete for better recall quality.</p>
           <label>Scenario Preset
             <div class="scenario-row">
               <select id="scenarioSelect"></select>
               <button type="button" id="applyScenarioBtn" class="btn">Apply</button>
             </div>
           </label>
-          <label>Service
-            <input name="service" value="payments-api" required />
-          </label>
-          <label>Severity
-            <select name="severity">
-              <option value="medium">medium</option>
-              <option value="high" selected>high</option>
-              <option value="critical">critical</option>
-              <option value="low">low</option>
-            </select>
-          </label>
+          <div class="field-row">
+            <label>Service
+              <input name="service" value="payments-api" required />
+            </label>
+            <label>Severity
+              <select name="severity">
+                <option value="medium">medium</option>
+                <option value="high" selected>high</option>
+                <option value="critical">critical</option>
+                <option value="low">low</option>
+              </select>
+            </label>
+          </div>
           <label>Objective
             <input name="objective" value="restore checkout success to above 97% in under 30 minutes" required />
           </label>
-          <label>Symptoms (one per line)
-            <textarea name="symptoms" rows="4">gateway timeout in card authorization
+          <div class="field-row">
+            <label>Symptoms (one per line)
+              <textarea name="symptoms" rows="5">gateway timeout in card authorization
 checkout retries increased 4x
 redis pool saturation alerts</textarea>
-          </label>
-          <label>Logs
-            <textarea name="logs" rows="5">TimeoutError: redis connection pool exhausted on payment-session-cache</textarea>
-          </label>
+            </label>
+            <label>Logs
+              <textarea name="logs" rows="5">TimeoutError: redis connection pool exhausted on payment-session-cache</textarea>
+            </label>
+          </div>
           <label>Tags (comma-separated)
             <input name="tags" value="redis,checkout,timeouts" />
           </label>
-          <button type="submit" class="btn primary full">Run Memory-Assisted Plan</button>
+          <div class="form-actions">
+            <button type="submit" class="btn primary full">Run Memory-Assisted Plan</button>
+          </div>
         </form>
 
         <section class="panel output">
@@ -121,7 +145,7 @@ redis pool saturation alerts</textarea>
         </table>
       </section>
 
-      <section class="panel">
+      <section class="panel split-bottom">
         <h2>Feedback Loop</h2>
         <form id="feedbackForm">
           <input type="hidden" name="query_id" />
@@ -142,8 +166,38 @@ redis pool saturation alerts</textarea>
           </label>
           <button type="submit" class="btn">Save Feedback to Memory</button>
         </form>
+
+        <form id="subscriptionForm" class="subscription">
+          <h2>Request SaaS Access</h2>
+          <p class="helper">Join the early access list for hosted Flashback Ops. We will contact your team with rollout details.</p>
+          <div class="field-row">
+            <label>Work Email
+              <input type="email" name="email" placeholder="oncall@yourcompany.com" required />
+            </label>
+            <label>Team Name
+              <input type="text" name="team_name" placeholder="Platform Reliability" required />
+            </label>
+          </div>
+          <div class="field-row">
+            <label>Team Size
+              <input type="number" name="team_size" min="1" max="500" value="12" required />
+            </label>
+            <label>Plan
+              <select name="plan">
+                <option value="starter">starter</option>
+                <option value="growth" selected>growth</option>
+                <option value="enterprise">enterprise</option>
+              </select>
+            </label>
+          </div>
+          <label>Primary Use Case
+            <textarea name="use_case" rows="3" placeholder="Tell us what incidents you want this to handle first."></textarea>
+          </label>
+          <button type="submit" class="btn primary">Request Access</button>
+        </form>
       </section>
     </main>
+    <div id="toast" class="toast" aria-live="polite"></div>
     <script src="/static/app.js" type="module"></script>
   </body>
 </html>
