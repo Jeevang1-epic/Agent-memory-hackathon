@@ -6,7 +6,9 @@ from fastapi.testclient import TestClient
 
 def _build_client(tmp_path: Path, monkeypatch):
     data_file = tmp_path / "memory.json"
+    subscriptions_file = tmp_path / "subscriptions.json"
     monkeypatch.setenv("FLASHBACK_DATA_FILE", str(data_file))
+    monkeypatch.setenv("FLASHBACK_SUBSCRIPTIONS_FILE", str(subscriptions_file))
     monkeypatch.setenv("FLASHBACK_MEMORY_BACKEND", "local")
     module = import_module("flashback_ops.app")
     module = reload(module)
@@ -65,3 +67,20 @@ def test_seed_assist_feedback_flow(tmp_path: Path, monkeypatch) -> None:
     )
     assert subscription.status_code == 200
     assert subscription.json()["status"] == "queued"
+
+    duplicate = client.post(
+        "/api/subscriptions",
+        json={
+            "email": "oncall@example.com",
+            "team_name": "Platform Reliability",
+            "team_size": 12,
+            "plan": "growth",
+            "use_case": "incident response memory intelligence",
+        },
+    )
+    assert duplicate.status_code == 200
+    assert duplicate.json()["status"] == "already_registered"
+
+    stats = client.get("/api/subscriptions/stats")
+    assert stats.status_code == 200
+    assert stats.json()["total"] >= 1
