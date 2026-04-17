@@ -11,6 +11,7 @@ class Settings:
     app_name: str
     memory_backend: str
     data_file: Path
+    subscriptions_file: Path
     max_recall: int
     hindsight_base_url: str
     hindsight_api_key: str
@@ -20,10 +21,13 @@ class Settings:
 def load_settings() -> Settings:
     file_override = os.getenv("FLASHBACK_DATA_FILE", "").strip()
     data_file = Path(file_override) if file_override else ROOT_DIR / "data" / "memory.json"
+    subscriptions_override = os.getenv("FLASHBACK_SUBSCRIPTIONS_FILE", "").strip()
+    subscriptions_file = Path(subscriptions_override) if subscriptions_override else ROOT_DIR / "data" / "subscriptions.json"
     return Settings(
         app_name=os.getenv("FLASHBACK_APP_NAME", "Flashback Ops"),
         memory_backend=os.getenv("FLASHBACK_MEMORY_BACKEND", "local"),
         data_file=data_file,
+        subscriptions_file=subscriptions_file,
         max_recall=int(os.getenv("FLASHBACK_MAX_RECALL", "5")),
         hindsight_base_url=os.getenv("HINDSIGHT_BASE_URL", "").strip(),
         hindsight_api_key=os.getenv("HINDSIGHT_API_KEY", "").strip(),
